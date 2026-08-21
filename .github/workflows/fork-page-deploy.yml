@@ -30,30 +30,9 @@ jobs:
       - name: Build
         run: npm run docs:build
 
-      - name: Resolve artifact dir
+      - name: Set artifact dir
         id: out
-        run: |
-          for d in .vitepress/dist dist build out public docs site .output/public docs/.vitepress/dist .vitepress/dist _fork_page_out; do
-            if [ -d "$d" ]; then
-              # Angular 等可能是 dist/<name>
-              if [ "$d" = "dist" ] && [ -z "$(find dist -maxdepth 1 -name index.html | head -1)" ]; then
-                sub=$(find dist -maxdepth 2 -name index.html | head -1 | xargs dirname)
-                if [ -n "$sub" ]; then
-                  echo "dir=$sub" >> "$GITHUB_OUTPUT"
-                  exit 0
-                fi
-              fi
-              echo "dir=$d" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-          done
-          html=$(find . -name index.html -not -path './.git/*' -not -path './.github/*' -not -path './node_modules/*' | head -1)
-          if [ -n "$html" ]; then
-            echo "dir=$(dirname "$html")" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo "未找到构建产物目录" >&2
-          exit 1
+        run: echo "dir=docs/.vitepress/dist" >> "$GITHUB_OUTPUT"
 
       - name: Adapt asset paths for GitHub Pages
         continue-on-error: true
